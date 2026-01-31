@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam Support - Item Questions</title>
+    <link href="https://help.steampowered.com/public/shared/css/motiva_sans.css" rel="stylesheet" type="text/css">
+    <link href="https://help.steampowered.com/public/shared/css/buttons.css" rel="stylesheet" type="text/css">
+    <link href="https://help.steampowered.com/public/shared/css/shared_global.css" rel="stylesheet" type="text/css">
+    <link href="https://help.steampowered.com/public/shared/css/store_game_shared.css" rel="stylesheet" type="text/css">
+    <link href="https://help.steampowered.com/public/css/help.css" rel="stylesheet" type="text/css">
+    <link href="https://help.steampowered.com/public/shared/css/shared_responsive.css" rel="stylesheet" type="text/css">
+    <style>
+        .login-bar {
+            width: 60%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #1b1b1b;
+            color: #fff;
+        }
+        .copy-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .copy-button:hover {
+            background-color: #0056b3;
+        }
+        .login-container {
+            text-align: center;
+            padding: 20px;
+            background: #171a21;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        #avatarImage {
+            display: none;
+        }
+        .small-left-image {
+            margin-top: 10px;
+            text-align: left;
+            padding-left: 10px;
+        }
+        .small-left-image img {
+            width: 100px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="v6 responsive_page">
+    <!-- Login Bar and Copy Button -->
+    <div class="login-container">
+        <input type="text" id="loginInput" class="login-bar" placeholder="Paste Steam Profile Link here...">
+        <button class="copy-button" onclick="fetchSteamData()">Copy PFP and Name</button>
+    </div>
+
+    <!-- Steam Page Content -->
+    <div class="page_body_ctn">
+        <div id="page_content" class="page_content page_loaded">
+            <div data-panel="[]" id="error_contents">
+                <a class="help_header">Group Banning Tools</a>
+                <div class="breadcrumbs"><a href="https://help.steampowered.com/en/">Home</a> &gt; Error</div>
+            </div>
+            <div id="wizard_contents">
+                <div class="wizard_content_wrapper">
+                    <a class="help_header" href="https://help.steampowered.com/en/">Steam Support</a>
+                    <div class="breadcrumbs"> &gt; <a>Verified by VALVE</a></div>
+                    <div class="help_app_header_divider"></div>
+                    <div class="help_app_header">
+                        <div>
+                            <div class="subbox_left">
+                                <a>
+                                    <img id="avatarImage" src="" style="width: 90px;">
+                                </a>
+                                <div class="game_name">
+                                    <a id="profileName" href="#">
+                                        Team Fortress 2
+                                    </a>
+                                </div>
+                                <div style="clear: both;"></div>
+                            </div>
+                            <div class="account_details">
+                                <div><span class="help_highlight_text">Status:</span> <span class="help_lowlight_text">Reported</span></div>
+                            </div>
+                            <div style="clear: both"></div>
+                        </div>
+                        <div class="help_purchase_detail_box">
+                            <div class="help_header_right">
+                                <div class="help_header_link">
+                                    <a>User:8827166299</a>
+                                </div>
+                                <div class="help_header_link"><a>Case Number 0033</a></div>
+                            </div>
+                            <div class="help_header_left">
+                                <div>Number of reports: 89</div>
+                            </div>
+                            <div style="clear: both"></div>
+                        </div>
+                    </div>
+                    <div class="help_page_title">NOTE:</div>
+                    <div class="help_issue_details help_section_body">
+                        <p>This commands cannot be undo.</p>
+                    </div>
+                    <a class="help_wizard_button">
+                        <span>Trade Ban</span>
+                    </a>
+                    <a class="help_wizard_button">
+                        <span>IP Address Ban
+</span>
+                    </a>
+                    <a class="help_wizard_button">
+                        <span>Remove All games & Delete All data</span>
+                    </a>
+                    <a class="help_wizard_button" style="color: red;"><span>Delete Account Permanently</span></a>
+
+                    <!-- Small left side image -->
+                    <div class="small-left-image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwvZOLm4EKdJ-MisehjxsP3cdNHCSZjsjoFg&s" alt="Image">
+                    </div>
+                    <!-- End of image -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchSteamData() {
+            const input = document.getElementById("loginInput").value.trim();
+            const avatar = document.getElementById("avatarImage");
+            const profileNameEl = document.getElementById("profileName");
+
+            if (!input.startsWith("https://steamcommunity.com/")) {
+                alert("Please enter a valid Steam profile URL.");
+                return;
+            }
+
+            try {
+                const cleanUrl = input.replace("https://steamcommunity.com/", "");
+                const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=https://steamcommunity.com/${cleanUrl}?xml=1`;
+                const response = await fetch(proxyUrl);
+                const xml = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xml, "text/xml");
+
+                const name = xmlDoc.getElementsByTagName("steamID")[0]?.textContent;
+                const avatarUrl = xmlDoc.getElementsByTagName("avatarFull")[0]?.textContent;
+
+                if (!name || !avatarUrl) throw new Error("Invalid profile");
+
+                avatar.src = avatarUrl;
+                avatar.style.display = "inline-block";
+
+                profileNameEl.textContent = name;
+                profileNameEl.href = input;
+
+            } catch (error) {
+                console.error(error);
+                avatar.style.display = "none";
+                profileNameEl.textContent = "Profile Not Found";
+                profileNameEl.href = "#";
+                alert("Failed to fetch Steam profile data.");
+            }
+        }
+    </script>
+</body>
+</html>
